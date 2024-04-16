@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block style %}
+<style>
+    /* Additional custom styles can be added here */
+</style>
+{% endblock %}
+
+{% block main_content %}
+<div class="w-full">
+    <!-- Blog Post -->
+    <section class="px-4 py-8 mx-auto lg:py-10 lg:px-6">
+        <div class="max-w-screen-xl mx-auto space-y-8 lg:space-y-6 mt-10">
+    
+            <div class="flex flex-wrap items-center justify-center lg:justify-between mt-5 mb-5">
+                {% for post in blogs %}
+                    <a href="{% url 'blog:blog_details' slug=post.slug %}" class="mt-4">
+                        <div
+                            class="max-w-sm bg-white border border-gray-200 rounded-lg shadow">
+    
+                            <img class="rounded-t-lg" src="{{post.featured_image.url}}" alt="" />
+    
+                            <div class="p-5">
+    
+                                <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">
+                                    {{post.title}}
+                                </h5>
+                                <div class="">
+                                    {% for category in post.categories.all %}
+                                    <small class="bg-gray-200 rounded-full py-1 px-3 text-sm text-gray-700 mr-2 mt-2">
+                                        {{ category.name}}
+                                    </small>
+                                    {% endfor %}
+    
+                                </div>
+                                <p class="mb-3 font-normal text-gray-700">{{post.content|safe|slice:100}}</p>
+                                <p class="mt-1"><small><i class="fa-regular fa-clock"></i>&nbsp;{{post.create_time}}</small></p>
+    
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    
+    </section>
+</div>
+
+{% endblock %}

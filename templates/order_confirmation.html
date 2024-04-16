@@ -1,0 +1,355 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block style %}
+<style>
+    .status-bar {
+        /* height: 100%; */
+        transition: width 0.3s ease-in-out;
+    }
+
+    .status-bar.ongoing {
+        background-color: #f59e0b;
+    }
+
+    .status-bar.succeed {
+        background-color: #10b981;
+    }
+
+    .status-bar.canceled {
+        background-color: #ef4444;
+    }
+</style>
+
+
+{% endblock %}
+
+{% block main_content %}
+<div class="w-full bg-gray-50 flex justify-center" >
+    <section class="w-full absolute max-w-screen-xl" style="margin-top: 100px;">
+        <div class="container mx-auto bg-white shadow-md rounded-lg p-10" >
+            <h1 class="text-2xl text-gray-500 font-bold mb-4">Create Order </h1>
+
+            <div class="status-bar-container mt-4 mb-4 flex justify-end">
+                <div id="statusBar" class="p-4 rounded-lg status-bar {{order.status}}">{{order.status|capfirst}}</div>
+            </div>
+            <form id="orderForm" class="space-y-4" >
+                <div class="flex space-x-4">
+                    <div class="w-1/2">
+                        <label for="fullName" class="block text-gray-700">Full Name:</label>
+                        <input type="text" id="fullName" name="fullName" value="{{order.full_name}}" 
+                        class="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm">
+                    </div>
+                    <div class="w-1/2">
+                        <label for="phone" class="block text-gray-700">Phone Number:</label>
+                        <input type="text" id="phone" name="phone" value="{{order.phone}}"
+                        class="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm">
+                    </div>
+                </div>
+                <div class="flex space-x-4">
+                    <div class="w-1/2">
+                        <label for="address" class="block text-gray-700" >Address:</label>
+                        <input type="text" id="address" name="address" value="{{order.address}}" required
+                        class="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm">
+                    </div>
+                    <div class="md:w-1/2">
+                        <label for="serviceDate" class="block text-gray-700">Service Date:</label>
+                        <input type="date" id="serviceDate" name="serviceDate" value="{{ order.service_date|date:'Y-m-d' }}"
+                        class="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm">
+                    </div>
+                </div>
+                <hr>
+                <div id="orderLinesContainer">
+                      {% for o_l in order_lines %}
+
+                      <div class="flex justify-around items-center order-line" id="orderLine{{forloop.counter0}}">
+                          <div>
+                              <input type="hidden" id="line_id{{forloop.counter0}}" name="line_id{{forloop.counter0}}" value="{{o_l.id}}">
+                          </div>
+                          <div class="mr-1">
+                              <label for="product{{forloop.counter0}}" class="text-sm font-medium text-gray-700">Product</label>
+                              <select id="product{{forloop.counter0}}" name="product{{forloop.counter0}}" onchange="changeLineProduct('{{forloop.counter0|escapejs}}'); updateSubtotal('{{forloop.counter0|escapejs}}')"
+                                  class=" mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm">
+                                  <option value="">---------------</option>
+                                  {% for product in products %}
+                                  <option {% if o_l.product.id == product.id %} selected {% endif %}
+                                      value="{{ product.id }}">{{ product.title }}</option>
+                                  {% endfor %}
+                              </select>
+                          </div>
+                          <div class="mr-1">
+                              <label for="service{{forloop.counter0}}" class="text-sm font-medium text-gray-700">Service</label>
+                              <select id="service{{forloop.counter0}}" name="service{{forloop.counter0}}"
+                                  onchange="changeLineService('{{forloop.counter0|escapejs}}', this); updateSubtotal('{{forloop.counter0|escapejs}}')"
+                                  class=" mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm">
+                                  <option value="">---------------</option>
+                                  {% for service in services %}
+                                  <option {% if o_l.service.id == service.id %} selected {% endif %}
+                                      value="{{ service.id }}" data-price="{{service.regular_price}}">{{ service.title }}
+                                  </option>
+                                  {% endfor %}
+                              </select>
+                          </div>
+                          <div class="mr-1">
+                              <label for="quantity{{forloop.counter0}}" class="text-sm font-medium text-gray-700">Quantity:</label>
+                              <input type="number" id="quantity{{forloop.counter0}}" name="quantity{{forloop.counter0}}" value="{{o_l.quantity}}" oninput="updateSubtotal('{{forloop.counter0|escapejs}}')"
+                                  class="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm">
+                          </div>
+                          <div class="mr-1">
+                              <label for="amount{{forloop.counter0}}" class="text-sm font-medium text-gray-700">Price:</label>
+                              <input type="number" id="amount{{forloop.counter0}}" value="{{o_l.service.regular_price}}"
+                                  oninput="updateSubtotal('{{forloop.counter0|escapejs}}')" name="amount{{forloop.counter0}}"
+                                  class="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm">
+                          </div>
+                          <div class="mr-1">
+                              <label for="subtotal{{forloop.counter0}}" class="text-sm font-medium text-gray-700">Subtotal:</label>
+                              <input type="number" id="subtotal{{forloop.counter0}}" name="subtotal{{forloop.counter0}}" value="{{o_l.subtotal}}"
+                                  class="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm">
+                          </div>
+                          <div class="mr-1 mt-7"><button id="dlete{{forloop.counter0}}" onclick="removeOrderLine('{{forloop.counter0|escapejs}}')"><i
+                                      class="fa-solid fa-delete-left text-[30px] text-gray-400"></button></i></div>
+                      </div>
+                      {% endfor %}
+                </div>
+                <div>
+                    <button type="button" id="addOrderLineBtn" class="bg-gray-400 text-[15px] text-white p-2 rounded-lg"><i class="fa-solid fa-plus"></i>&nbsp;New Service</button>
+                </div>
+                <hr>
+                <div class="flex space-x-4 justify-between">
+                    <div class="w-1/2">
+                        <label for="note" class="block text-gray-700">Note:</label>
+                        <textarea id="note" name="note" rows="3"
+                        class="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm"></textarea>
+                    </div>
+                    <div class="">
+                        <label for="billAmount" class="block text-gray-700">Total Amount:</label>
+                        <input type="number" id="billAmount" name="billAmount"
+                        class="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm">
+                    </div>
+                </div>
+                <div class="flex space-x-4 justify-end">
+                    <div class="">
+                        {% if order.status == 'succeed' %}
+                        <!-- <button type="submit" onclick="processOrder('{{ order.id|escapejs }}', this.form, event)" class="bg-green-500 text-white px-4 py-2 rounded-md ml-4">Update
+                            Order</button> -->
+                        <a href="{% url 'order:generate_invoice' pk=order.pk %}" class="bg-green-600 text-white p-3 rounded-md ml-4">Generate
+                            Invoice</a>
+                        {% elif order.status == 'ongoing' or order.status == 'canceled'  %}
+                        <a href="{% url 'order:cancel_order' pk=order.pk %}" class="bg-red-500 text-white px-4 py-2 rounded-md ml-4">Cancel
+                            Order</a>
+                        <button type="submit" onclick="processOrder('{{ order.id|escapejs }}', this.form, event)" class="bg-green-500 text-white px-4 py-2 rounded-md ml-4">Success
+                            Order</button>
+                        
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+</div>
+
+<script>
+    // Function to add order line fields dynamically
+    document.getElementById('addOrderLineBtn').addEventListener('click', function () {
+        const container = document.getElementById('orderLinesContainer');
+        const orderLineCount = container.querySelectorAll('.order-line').length;
+
+        const orderLineHtml = `
+        <div class="flex justify-around items-center order-line " id="orderLine${orderLineCount}">
+          <div class="mr-1">
+            <label for="product${orderLineCount}" class="text-sm font-medium text-gray-700">Product</label>
+                <select id="product${orderLineCount}" name="product${orderLineCount}" onchange="changeLineProduct(${orderLineCount}); updateSubtotal(${orderLineCount})" class="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm">
+                    <option value="">---------------</option>
+                    {% for product in products %}
+                    <option value="{{ product.id }}">{{ product.title }}</option>
+                    {% endfor %}
+                </select>
+          </div>
+          <div class="mr-1">
+            <label for="service${orderLineCount}" class="text-sm font-medium text-gray-700">Service</label>
+                <select id="service${orderLineCount}" name="service${orderLineCount}" onchange="changeLineService(${orderLineCount}, this); updateSubtotal(${orderLineCount})" class="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm">
+                    <option value="">---------------</option>
+                    {% for service in services %}
+                    <option value="{{ service.id }}">{{ service.title }}</option>
+                    {% endfor %}
+                </select>
+          </div>
+          <div class="mr-1">
+            <label for="quantity${orderLineCount}" class="text-sm font-medium text-gray-700">Quantity:</label>
+            <input type="number" id="quantity${orderLineCount}" name="quantity${orderLineCount}" value="1" oninput="updateSubtotal(${orderLineCount})" class="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm">
+          </div>
+          <div class="mr-1">
+            <label for="amount${orderLineCount}" class="text-sm font-medium text-gray-700">Price:</label>
+            <input type="number" id="amount${orderLineCount}" name="amount${orderLineCount}" oninput="updateSubtotal(${orderLineCount})" class="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm">
+          </div>
+          <div class="mr-1">
+            <label for="subtotal${orderLineCount}" class="text-sm font-medium text-gray-700">Subtotal:</label>
+            <input type="number" id="subtotal${orderLineCount}" name="subtotal${orderLineCount}" class="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm">
+          </div>
+          <div class="mr-1 mt-7"><button id="dlete${orderLineCount}" onclick="removeOrderLine(${orderLineCount})"><i class="fa-solid fa-delete-left text-[30px] text-gray-400" ></button></i></div>
+        </div>
+      `;
+
+        container.insertAdjacentHTML('beforeend', orderLineHtml);
+    });
+
+    function validateForm() {
+        const fullName = document.getElementById('fullName');
+        const phone = document.getElementById('phone');   
+        const address = document.getElementById('address');
+        const serviceDate = document.getElementById('serviceDate');
+        
+        if (fullName.value === '') {
+            alert('Please enter your full name.');
+            return false;
+        }
+        if (phone.value === '') {
+            alert('Please enter your phone.');
+            return false;
+        }
+        if (address.value === '') {
+            alert('Please enter your address.');
+            return false;
+        }
+        if (serviceDate.value === '') {
+            alert('Please enter your service date.');
+            return false;
+        }
+        return true;
+    }
+
+    function processOrder(orderId, formElement, event){
+        event.preventDefault();
+
+        // Perform form validation
+        if (!validateForm()) {
+            // If validation fails, return early
+            return;
+        }
+
+        const formData = new FormData(formElement);
+        const orderLines = [];
+        const orderLineCount = document.querySelectorAll('.order-line').length;
+
+        for (let i = 0; i < orderLineCount; i++) {
+            const line_id = formData.get(`line_id${i}`)
+            const product = formData.get(`product${i}`);
+            const service = formData.get(`service${i}`);
+            const quantity = formData.get(`quantity${i}`);
+            const amount = formData.get(`amount${i}`);
+            const subtotal = formData.get(`subtotal${i}`);
+
+            orderLines.push({line_id, product, service, quantity, amount, subtotal });
+        }
+
+        const orderData = {
+            fullName: formData.get('fullName'),
+            phone: formData.get('phone'),
+            address: formData.get('address'),
+            serviceDate: formData.get('serviceDate'),
+            status: formData.get('status'),
+            billAmount: formData.get('billAmount'),
+            note: formData.get('note'),
+            orderLines: orderLines
+        };
+
+        // Function to get CSRF token from cookies
+        function getCookie(name) {
+            const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+            return cookieValue ? cookieValue.pop() : '';
+        }
+
+        // Add CSRF token to headers
+        const csrftoken = getCookie('csrftoken');
+        const headers = {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+        };
+
+        // Make an API call to post the order data
+        fetch(`/order/api/process_order/${orderId}/`, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(orderData)
+        })
+        .then(response => {
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Handle errors
+        });
+    };
+
+</script>
+<script>
+    function changeLineProduct( selectedLine) {
+
+        var productId = document.getElementById('product'+selectedLine).value;
+        var serviceSelect = document.getElementById('service'+selectedLine);
+        serviceSelect.innerHTML = '<option value="">---------------</option>';
+        if (productId) {
+            fetch('/order/api/services/?product_id=' + productId)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(service => {
+                        var option = document.createElement('option');
+                        option.value = service.id;
+                        option.text = service.title;
+                        option.setAttribute('data-price', service.discount_price);
+                        serviceSelect.appendChild(option);
+                    });
+                });
+        }
+    };
+
+    function changeLineService(selectedLine, selectElement){
+
+        var serviceSelectd = document.getElementById('service'+selectedLine);
+        var amountSelectd = document.getElementById('amount'+selectedLine);
+
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const price = selectedOption.getAttribute('data-price');
+
+        amountSelectd.value=price;        
+    }
+
+    function removeOrderLine(orderLineCount) {
+        const orderLine = document.getElementById(`orderLine${orderLineCount}`);
+        if (orderLine) {
+            orderLine.remove(); // Remove the order line element
+        }
+    }
+
+    function updateSubtotal(selectedLine) {
+        // Get values
+        const quantity = parseInt(document.getElementById(`quantity${selectedLine}`).value);
+        const price = parseFloat(document.getElementById(`amount${selectedLine}`).value);
+        const subtotalField = document.getElementById(`subtotal${selectedLine}`);
+
+        // Calculate subtotal
+        const subtotal = isNaN(quantity) || isNaN(price) ? 0 : quantity * price;
+
+        // Update subtotal field
+        subtotalField.value = subtotal.toFixed(2);
+
+        calculateTotal();
+    }
+    function calculateTotal(){
+        // Calculate total bill amount
+        const orderLineCount = document.querySelectorAll('.order-line').length;
+        let totalBillAmount = 0;
+        for (let i = 0; i < orderLineCount; i++) {
+            const subtotal = parseFloat(document.getElementById(`subtotal${i}`).value);
+            totalBillAmount += isNaN(subtotal) ? 0 : subtotal;
+        }
+
+        // Update total bill amount field
+        document.getElementById('billAmount').value = totalBillAmount.toFixed(2);
+
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        calculateTotal();
+    });
+</script>
+
+{% endblock main_content %}

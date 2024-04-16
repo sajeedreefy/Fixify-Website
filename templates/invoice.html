@@ -1,0 +1,191 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        } */
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .invoice-details {
+            margin-bottom: 20px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .invoice-details th,
+        .invoice-details td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            font-size: 15px;
+        }
+
+        .invoice-details th {
+            background-color: #336881;
+            color: white;
+        }
+
+        .total {
+            margin-top: 20px;
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #888;
+        }
+
+        .top-head {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+
+        }
+
+        .top-head .head-left {
+            width: 50%;
+        }
+
+        .top-head .head-right {
+            width: 50%;
+            text-align: right;
+
+        }
+
+        .top-head .head-right span {
+            color: #888;
+            font-size: 15px;
+        }
+        .top-head .head-left span {
+            color: #888;
+            font-size: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="top-head">
+            <div class="head-left">
+                <div>
+                    <img src="http://{{domain}}{{preference.logo.url}}" alt="logo"
+                        style="height: 30px; width: 120px;"><br>
+                    <h5>We Believe in Service</h5>
+                </div>
+            </div>
+            <div class="head-right">
+                <div>
+                    <h5>technician.com.bd</h5>
+                    <span>{{preference.email}}</span><br>
+                    <span>{{preference.phone}}</span><br>
+                    <span>{{preference.address}}</span><br>
+                </div>
+            </div>
+        </div>
+        <div class="top-head" style="margin-top: 15px;">
+            <div class="head-left">
+
+                <div>
+                    <span style="color: black;"><b>Bill to :</b></span><br>
+                    <span>Name: {{order.full_name}}</span><br>
+                    <span>Address: {{order.address}}</span><br>
+                    <span>Phone: {{order.phone}}</span>
+    
+                </div>
+            </div>
+            <div class="head-right">
+                <div>
+                    <span><b style="color: black;">Invoice number: </b>{{order.invoice_number}}</span><br>
+                    <span><b style="color: black;">Invoice Date: </b>{{order.service_date}}</span><br>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+        <div>
+            <h5>Bill - Challan</h5>
+            <table class="invoice-details">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Service</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {%for ord in order_lines %}
+                    <tr>
+                        <td>{{ ord.product.title }}</td>
+                        <td>{{ ord.service.title }}</td>
+                        <td>{{ ord.quantity }}</td>
+                        <td>{{ ord.amount }}</td>
+                        <td>{{ ord.subtotal }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% if order.discount > 0 %}
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><b>Bill</b></td>
+                        <td><b>{{ order.bill_amount }}</b></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><b>Discount</b></td>
+                        <td><b>{{ order.bill_amount }}</b></td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><b>Total</b></td>
+                        <td><b>{{ order.bill_amount }}</b></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p>Thank you for your business</p>
+        </div>
+    </div>
+</body>
+
+</html>

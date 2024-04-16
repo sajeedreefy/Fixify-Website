@@ -1,0 +1,625 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block style %}
+<style>
+    .swiper-button-prev::after,
+    .swiper-button-next::after {
+        content: none;
+    }
+
+    .triangle {
+        width: 25px;
+        height: 25px;
+        background-color: rgb(249 250 251);
+        position: absolute;
+        border-left: .5px solid rgb(202, 202, 202);
+        border-top: .5px solid rgb(202, 202, 202);
+        left: 50%;
+        bottom: 93%;
+        transform: translateX(-50%) rotate(45deg);
+        z-index: 20;
+    }
+</style>
+
+{% endblock %}
+{% block main_content %}
+<div class="w-full">
+    <!-- Start block -->
+    <section class="bg-gray-50">
+        <div class="grid max-w-screen-xl px-4 pt-20 pb-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12 lg:pt-28">
+            <div class="mr-auto place-self-center lg:col-span-7 order-2 sm:order-1 text-center sm:text-left">
+                <h1 class="max-w-2xl mb-4 font-extrabold leading-none tracking-tight text-4xl md:text-5xl xl:text-6xl"
+                    style="color: #262626;">
+                    {{banner.title}}</h1>
+                <p class="max-w-2xl mb-6 font-light text-gray-500 lg:mb-8 md:text-lg lg:text-xl">{{banner.sub_title}}
+                </p>
+                <div class="space-y-4 sm:flex sm:space-y-0 sm:space-x-4">
+                    <button data-modal-target="popup-modal" data-modal-toggle="popup-modal" type="button"
+                        class="focus:outline-none text-white bg-red-500 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">Book
+                        Technician &nbsp; <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+            <div class="mt-0 col-span-5 flex sm:flex-col order-1 sm:order-2">
+                <img src="{{banner.hero_image.url}}" alt="hero image">
+            </div>
+        </div>
+        <div id="popup-modal" tabindex="-1" aria-hidden="true"
+            class="hidden shadow-xl rounded-lg overflow-y-auto overflow-x-hidden fixed top-20 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(90%-1rem)] max-h-full">
+            <div class="relative p-4 w-full max-w-2xl max-h-full">
+                <!-- Modal content -->
+                <div class="relative bg-white rounded-lg shadow">
+                    <!-- Modal header -->
+                    <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
+                        <h3 class="text-xl font-semibold text-gray-900">
+                            Book Technician Now
+                        </h3>
+                        <button type="button"
+                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
+                            data-modal-hide="popup-modal">
+                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 14 14">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                            </svg>
+                            <span class="sr-only">Close modal</span>
+                        </button>
+                    </div>
+                    <!-- Modal body -->
+                    <form method="POST" action="{% url 'order:post_order' %}">
+                        {% csrf_token %}
+                        <div class="p-4 md:p-5 space-y-4 overflow-y-auto max-h-[60vh]">
+                            <!-- First Row for Name and Telephone -->
+                            <div class="flex flex-wrap -mx-2">
+                                <div class="w-full px-2 mb-4 md:mb-0 md:w-1/2">
+                                    <label for="name" class="text-sm font-medium text-gray-700">Name *</label>
+                                    <input type="text" name="name" id="name"
+                                        class="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm"
+                                        required>
+                                </div>
+                                <div class="w-full px-2 mb-4 md:mb-0 md:w-1/2">
+                                    <label for="telephone" class="text-sm font-medium text-gray-700">Telephone *</label>
+                                    <input type="tel" name="telephone" id="telephone"
+                                        class="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm"
+                                        required>
+                                </div>
+                            </div>
+                            <!-- Second Row for Address and Branch -->
+                            <div class="flex flex-wrap -mx-2">
+                                <div class="w-full px-2 mb-4 md:mb-0 md:w-1/2">
+                                    <label for="address" class="text-sm font-medium text-gray-700">Address *</label>
+                                    <input type="text" name="address" id="address"
+                                        class="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm"
+                                        required>
+                                </div>
+                                <div class="w-full px-2 mb-4 md:mb-0 md:w-1/2">
+                                    <label for="id_branch" class="text-sm font-medium text-gray-700">Branch *</label>
+                                    <select id="id_branch" name="branch"
+                                        class="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm"
+                                        required>
+                                        <option value="">---------------</option>
+                                        {% for branch in branches %}
+                                        <option value="{{ branch.id }}">{{ branch.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- Third Row for Product and Service -->
+                            <div class="w-full px-2">
+                                <label for="id_service_date" class="text-sm font-medium text-gray-700">Date *</label>
+                                <input type="date" name="service_date" id="id_service_date"
+                                    class="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm"
+                                    required>
+                            </div>
+
+                            <!-- Fourth Row for Product and Service -->
+                            <div class="flex flex-wrap -mx-2">
+                                <div class="w-full px-2 mb-4 md:mb-0 md:w-1/2">
+                                    <label for="product" class="text-sm font-medium text-gray-700">Product *</label>
+                                    <select id="product" name="product"
+                                        class="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm"
+                                        required>
+                                        <option value="">---------------</option>
+                                        {% for product in products %}
+                                        <option value="{{ product.id }}">{{ product.title }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="w-full px-2 mb-4 md:mb-0 md:w-1/2">
+                                    <label for="service" class="text-sm font-medium text-gray-700">Service *</label>
+                                    <select id="service" name="service"
+                                        class="w-full mt-1 py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm"
+                                        required>
+                                        <option value="">---------------</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="w-full px-2 mb-4 md:mb-0 md:w-1/2">
+                                <label for="id_quantity" class="text-sm font-medium text-gray-700">Quantity *</label>
+                                <input type="number" name="quantity" id="id_quantity"
+                                    class="mt-1 w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-300 focus:border-red-300 sm:text-sm"
+                                    required>
+                            </div>
+                            <div class="flex flex-wrap -mx-2 items-center">
+                                <div class="hidden w-full px-2 mb-4 md:mb-0 md:w-1/2" id="price-card">
+                                    <label for="price-card" class="text-sm font-medium text-gray-700">Price Info</label>
+                                    <div class="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow ">
+
+                                        <img class="p-8 rounded-t-lg" id="price-card-image" src=""
+                                            alt="product image" />
+                                        <div class="px-5 pb-5">
+                                            <a href="#">
+                                                <h5 class="text-xl font-semibold tracking-tight text-gray-900 "
+                                                    id="price-card-name">
+                                                </h5>
+                                            </a>
+                                            <div class="flex items-center justify-between">
+                                                <div>
+                                                    <span>Regular Price:</span>
+                                                    <del class="text-2xl font-bold text-gray-900">
+                                                        <span id="price-card-price-regular"></span>
+                                                    </del>
+                                                </div>
+                                                <div>
+                                                    <span>Discount Price:</span>
+                                                    <span class="text-2xl font-bold text-gray-900"
+                                                        id="price-card-price-discount"></span>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <!-- Modal footer -->
+                        <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b">
+                            <button type="submit"
+                                class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">Get
+                                Service</button>
+                            <button data-modal-hide="popup-modal" type="button"
+                                class="ml-3 py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700">Not
+                                Now</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- End block -->
+</div>
+<!-- End block -->
+
+
+<!-- Start block -->
+<section class="bg-white">
+    <div class="max-w-screen-xl px-4 py-8 mx-auto space-y-12 lg:space-y-10 lg:py-10 lg:px-6">
+        <div>
+            <p class="text-4xl md:text-5xl xl:text-6xl font-bold text-center" style="color: #33335E;">Service Overview
+            </p>
+            <p class="text-xl text-center text-[#5D6467]" style="color: #5D6467;">A Brief story about the service</p>
+        </div>
+
+        <!-- Slider -->
+        <div class="relative w-5/5 mx-auto bg-white rounded-lg shadow p-2" style="overflow: hidden;">
+            <!-- Swiper Container -->
+            <div class="swiper-container my-8">
+                <div class="swiper-wrapper flex items-center">
+
+                    <!-- Slide 1 -->
+                    {% for product in products %}
+                    <div class="swiper-slide">
+                        <div class="bg-white  p-4 flex items-center justify-center flex-col">
+                            <img src="{{product.image.url}}" alt="">
+                            <p class="text-gray-600 mt-2 mt-2">{{product.title}}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                <!-- <div class="swiper-pagination"></div> -->
+
+                <!-- Navigation Buttons -->
+                <div class="swiper-button-prev bg-white rounded-full shadow" style="height: 30px; width: 30px;">
+                    <img src="{% static 'images/left_arrow.png'%}" alt="">
+                </div>
+                <div class="swiper-button-next bg-white rounded-full shadow" style="height: 30px; width: 30px;">
+                    <img src="{% static 'images/right_arrow.png'%}" alt="">
+                </div>
+            </div>
+
+        </div>
+        <!-- Row -->
+
+        <div class="items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16">
+            <div class="text-gray-500 sm:text-lg">
+                <ul role="list" class=" space-y-5 my-7">
+                    {% for item in service_overview %}
+                    <li class="flex space-x-3">
+                        <!-- Icon -->
+                        <svg class="flex-shrink-0 w-5 h-5 text-red-500  mt-2" fill="currentColor" viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        <div>
+                            <h3 class="text-3xl text-[#33335E]">{{item.title}}</h3>
+                            <span class="text-base font-medium leading-tight text-[#646464] ">
+                                {{item.sub_title}}
+                            </span>
+                        </div>
+                    </li>
+
+                    {% endfor %}
+
+                </ul>
+                <!-- <a href="#" type="button"
+                    class="focus:outline-none text-white bg-red-500 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">Learn
+                    More &nbsp; <i class="fa-solid fa-arrow-right"></i></a> -->
+            </div>
+            <div class="flex items-center justify-center">
+                <img class="hidden mb-4 rounded-lg lg:mb-0 lg:flex" width="430px" height="698px"
+                    src="{% static '/images/feature-1.png'%}" alt="dashboard feature image">
+            </div>
+        </div>
+
+    </div>
+</section>
+<!-- End block -->
+<section class="flex flex-col items-center justify-center">
+    <div>
+        <p class="text-4xl md:text-5xl xl:text-6xl font-bold text-center text-[#33335E]">Check This Our Showcase of <br>
+            Completed Projects</p>
+    </div>
+
+    <div class=" flex items-center justify-around py-4 md:py-8 flex-wrap">
+        <button type="button" id="all-projects"
+            class=" project-button mr-4 bg-red-700 text-white border border-red-600 focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-lg text-base font-medium px-5 py-2.5 text-center me-3 mb-3">All
+            Projects</button>
+        <button type="button" id="installation"
+            class=" project-button mr-4 text-gray-900 border border-white hover:border-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-lg text-base font-medium px-5 py-2.5 text-center me-3 mb-3">Installation</button>
+        <button type="button" id="replacement"
+            class="project-button mr-4 text-gray-900 border border-white hover:border-gray-200  focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-lg text-base font-medium px-5 py-2.5 text-center me-3 mb-3">Replacement</button>
+        <button type="button" id="inspection"
+            class="project-button text-gray-900 border border-white hover:border-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-300 rounded-lg text-base font-medium px-5 py-2.5 text-center me-3 mb-3">Inspection</button>
+    </div>
+    <div id="gal-container" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {% for img in gallery %}
+        <div>
+            <img class="h-auto max-w-full rounded-lg" src="{{img.image.url}}" alt="">
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="bg-white my-8">
+    <div class="max-w-screen-xl px-4 mx-auto space-y-12 lg:space-y-10 lg:py-10 lg:px-6">
+        <div>
+            <p class="text-4xl md:text-5xl xl:text-6xl font-bold text-center text-[#33335E]"> We are in Headlines</p>
+        </div>
+        <!-- Slider -->
+        <div class="relative mx-auto bg-white p-2" style="overflow: hidden;">
+            <!-- Swiper Container -->
+            <div class="swiper-container-2">
+                <div class="swiper-wrapper flex items-center">
+
+                    <!-- Slide 1 -->
+                    {% for news in news_coverage %}
+                    <div class="swiper-slide"
+                        onclick="updateNewsShow('{{ news.headline|escapejs }}', '{{ news.context|escapejs }}', '{{news.news_link|escapejs}}')">
+                        <div class="bg-white p-4 flex items-center justify-center flex-col">
+                            <img src="{{ news.media_logo.url }}" alt="">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+
+                <!-- Navigation Buttons -->
+                <div class="swiper-button-prev bg-white rounded-full shadow" style="height: 30px; width: 30px;">
+                    <img src="{% static 'images/left_arrow.png'%}" alt="">
+                </div>
+                <div class="swiper-button-next bg-white rounded-full shadow" style="height: 30px; width: 30px;">
+                    <img src="{% static 'images/right_arrow.png'%}" alt="">
+                </div>
+            </div>
+
+        </div>
+        <div id="news-show" class="relative w-full bg-gray-50 p-5 border">
+            <div class="triangle"></div>
+            <h3 class="font-bold">{{news_coverage.0.headline}}</h3><br>
+            <p>{{news_coverage.0.context}}</p>
+            <br><a href="{{news_coverage.0.news_link}}" class="text-red-400">View Article &nbsp; <i
+                    class="fa-solid fa-arrow-right"></i></a>
+        </div>
+
+
+    </div>
+</section>
+<section>
+    <div
+        class="h-50 text-4xl text-white bg-green-500 p-10 flex flex-col justify-around items-center sm:flex-row sm:items-center">
+        <div>
+            <p>Start Your Journey with <br> Technician Franchise Today!</p>
+        </div>
+        <div class="mt-4 sm:mt-0">
+            <button
+                class="border border-white text-2xl text-white px-4 py-2 rounded hover:bg-white hover:text-green-500 transition duration-300">Apply
+                Now</button>
+        </div>
+    </div>
+</section>
+
+<!-- Branches Section -->
+
+<section class="px-4 py-8 mx-auto lg:py-10 lg:px-6">
+    <div class="max-w-screen-xl mx-auto space-y-8 lg:space-y-6">
+
+        <div>
+            <p class="text-4xl md:text-5xl xl:text-6xl font-bold text-center" style="color: #33335E;">Branches</p>
+
+        </div>
+        <div class="flex flex-col lg:flex-row lg:justify-between">
+            <div class="w-full lg:w-6/12 flex flex-wrap items-center justify-center lg:justify-start">
+                {% for branch in branches %}
+                <div class="p-3 rounded-md shadow-lg flex flex-row items-center" style="cursor: pointer;"
+                    onclick="showAddress('{{branch.address|escapejs}}', '{{branch.phone|escapejs}}')">
+                    <img src="{% static 'images/branch_city.png' %}" class="mr-2" height="10px" width="10px"
+                        alt="">{{branch.name}}
+                </div>
+                {% endfor %}
+
+            </div>
+            <div class="w-full lg:w-6/12 flex justify-center">
+                <div class="shadow-md p-4 flex items-center justify-around" style="height: auto; width: 426px;">
+                    <div>
+                        <p class="font-bold text-2xl">Our <br>
+                            Branches <br> Near you</p>
+                        <small>Contact Us</small><br>
+                        <small id="addressContainer"></small><br>
+                        <small id="phoneContainer"></small>
+                    </div>
+                    <div class="flex flex-wrap justify-center items-center">
+                        <img src="{% static 'images/mapa-SCXmbr4eQn.png'%}" class="absolute" alt="" height="120px"
+                            width="120px">
+                        <div id="lottie-container" style="height: 100px; width: 100px;"></div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- App Section -->
+<!-- <section style="background-color: #FFF8F8;">
+    <div class="flex flex-wrap justify-evenly items-center p-5">
+        <div class="flex justify-center items-end mt-5 lg:mt-0">
+            <img src="{% static 'images/double_image.png' %}" height="380" width="360">
+
+        </div>
+        <div class="flex flex-col justify-center align-center lg:justify-start">
+            <p style="color: #5D6467; text-transform: uppercase;">Download Our APP</p>
+            <p class="font-bold" style="color: #33335E; font-size: 45px;">We fix repair and <br> maintain with precision
+            </p>
+            <div class="flex">
+                <img src="{% static 'images/App-Store-ds.png' %}" class="mr-4" alt="">
+                <img src="{% static 'images/Google-Play-ds.png' %}" alt="">
+            </div>
+        </div>
+
+    </div>
+</section> -->
+<section class="px-4 py-8 mx-auto lg:py-10 lg:px-6">
+    <div class="max-w-screen-xl mx-auto space-y-8 lg:space-y-6">
+        <div>
+            <p class="text-4xl md:text-5xl xl:text-6xl font-bold text-center" style="color: #33335E;">Blog</p>
+
+        </div>
+
+        <div class="flex flex-wrap items-center justify-center lg:justify-between mt-5 mb-5">
+            {% for post in blogs %}
+            {% if forloop.counter <= 3 %} <a href="{% url 'blog:blog_details' slug=post.slug %}" class="mt-4">
+                <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow">
+
+                    <img class="rounded-t-lg" src="{{post.featured_image.url}}" alt="" />
+
+                    <div class="p-5">
+
+                        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">
+                            {{post.title}}
+                        </h5>
+                        <div class="">
+                            {% for category in post.categories.all %}
+                            <small class="bg-gray-200 rounded-full py-1 px-3 text-sm text-gray-700 mr-2 mt-2">
+                                {{ category.name}}
+                            </small>
+                            {% endfor %}
+
+                        </div>
+                        <p class="mb-3 font-normal text-gray-700">{{post.content|safe|slice:100}}</p>
+                        <p class="mt-1"><small><i class="fa-regular fa-clock"></i>&nbsp;{{post.create_time}}</small></p>
+
+                    </div>
+                </div>
+                </a>
+                {% endif %}
+                {% endfor %}
+
+
+        </div>
+        <div class="flex justify-end">
+            <a href="{% url 'blog:list_page' %}"
+                class="mt-2 inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300">
+                Read more
+                <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                    fill="none" viewBox="0 0 14 10">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M1 5h12m0 0L9 1m4 4L9 9" />
+                </svg>
+            </a>
+        </div>
+
+    </div>
+
+
+</section>
+{% include 'footer.html' %}
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.11/lottie.min.js"></script>
+<script src="{% static 'js/slider_script.js' %}"></script>
+<!-- <script src="{% static 'js/animation_scripts.js' %}"></script> -->
+<script>
+    function validateForm() {
+
+        const address = document.getElementById('address');
+        if (address.value === '') {
+            alert('Please enter your full name.');
+            return false;
+        }
+
+        return true;
+    }
+</script>
+<script>
+    document.getElementById('product').addEventListener('change', function () {
+
+        var productId = this.value;
+        var serviceSelect = document.getElementById('service');
+        serviceSelect.innerHTML = '<option value="">---------------</option>';
+        if (productId) {
+            fetch('order/api/services/?product_id=' + productId)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(service => {
+                        var option = document.createElement('option');
+                        option.value = service.id;
+                        option.text = service.title;
+                        serviceSelect.appendChild(option);
+                    });
+                });
+        }
+    });
+    document.getElementById('service').addEventListener('change', function () {
+
+        var serviceId = this.value;
+        if (serviceId) {
+            fetch('order/api/services/?service_id=' + serviceId)
+                .then(response => response.json())
+                .then(data => {
+                    var priceCard = document.getElementById('price-card');
+                    priceCard.classList.remove('hidden');
+                    document.getElementById('price-card-image').src = data.product_image
+                    document.getElementById('price-card-name').innerHTML = data.title;
+                    document.getElementById('price-card-price-regular').innerHTML = data.regular_price;
+                    document.getElementById('price-card-price-discount').innerHTML = data.discount_price;
+                });
+        }
+    });
+
+</script>
+
+<script>
+    function updateNewsShow(param1, param2, param3) {
+        // Get the news-show div
+        var newsShowDiv = document.getElementById('news-show');
+
+        // Update the content with the parameter values
+        newsShowDiv.classList.remove('hidden');
+        newsShowDiv.querySelector('h3').innerHTML = param1;
+        newsShowDiv.querySelector('p').innerHTML = param2;
+        newsShowDiv.querySelector('a').href = param3;
+    }
+</script>
+<script>
+    var animationDataUrl = "{% static 'images/Animation - 1709094674638.json' %}";
+
+    fetch(animationDataUrl)
+        .then(response => response.json())
+        .then(animationData => {
+            var animationContainer = document.getElementById('lottie-container');
+            var anim = lottie.loadAnimation({
+                container: animationContainer,
+                renderer: 'svg',
+                loop: true,
+                autoplay: true,
+                animationData: animationData
+            });
+        })
+        .catch(error => console.error('Error loading animation:', error));
+</script>
+<script>
+    const buttons = document.querySelectorAll('.project-button');
+
+    buttons.forEach(button => {
+        button.addEventListener('click', function () {
+            // Remove red background from all buttons
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-red-700');
+                btn.classList.remove('border-red-600');
+                btn.classList.remove('text-white');
+            });
+
+            // Add red background to the clicked button
+            this.classList.add('bg-red-700');
+            this.classList.add('border-red-600');
+            this.classList.add('text-white');
+        });
+    });
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("all-projects").addEventListener("click", function () {
+            filterImages('all');
+        });
+
+        document.getElementById("installation").addEventListener("click", function () {
+            filterImages('installation');
+        });
+
+        document.getElementById("replacement").addEventListener("click", function () {
+            filterImages('replacement');
+        });
+
+        document.getElementById("inspection").addEventListener("click", function () {
+            filterImages('inspection');
+        });
+
+        function filterImages(category) {
+            fetch(`/filter-images/?category=${category}`)
+                .then(response => response.json())
+                .then(data => {
+                    const galleryDiv = document.getElementById('gal-container');
+
+                    galleryDiv.innerHTML = "";
+                    data.forEach(img => {
+                        const imgElement = document.createElement("img");
+                        imgElement.className = "h-auto max-w-full rounded-lg";
+                        imgElement.src = img.image;
+                        imgElement.alt = "";
+                        galleryDiv.appendChild(imgElement);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    });
+</script>
+<script>
+    function showAddress(address, phone) {
+
+        var addressContainer = document.getElementById('addressContainer');
+        var phoneContainer = document.getElementById('phoneContainer');
+
+        addressContainer.innerHTML = address;
+        phoneContainer.innerHTML = phone;
+    }
+</script>
+
+
+
+
+{% endblock main_content %}

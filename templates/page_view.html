@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block style %}
+<style>
+    .main-content {
+        min-height: 100vh;
+    }
+
+    .featured-image {
+        position: relative;
+        width: 100%;
+        height: 400px;
+        /* Adjust height as needed */
+        overflow: hidden;
+        object-fit: fill;
+    }
+
+
+    /* .header-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #fff;
+        text-align: center;
+    } */
+
+    .header-overlay h1 {
+        font-size: 36px;
+        font-weight: bold;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        z-index: 6;
+    }
+
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 400PX;
+        background-color: rgba(0, 0, 0, 0.638);
+        overflow: hidden;
+        /* Dark overlay blend */
+        z-index: 5;
+    }
+
+    .featured-image {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .title {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 20;
+        color: #fff;
+        text-align: center;
+        font-size: 2.5rem;
+    }
+</style>
+
+{% endblock %}
+
+{% block main_content %}
+<div class="main-content">
+    <!-- <div class="header-image">
+        <img src="{{ page_data.feature_image.url }}" alt="Header Image">
+        <div class="header-overlay">
+            <h1>{{page_data.title}}</h1>
+        </div>
+    </div>
+    <div class="w-full bg-gray-50 flex justify-center">
+        <div class="container mx-auto bg-white p-5">
+            {{ page_data.content|safe }}
+        </div>
+    </div> -->
+    <div class="">
+        <div class="featured-image relative">
+            <img src="{{ page_data.feature_image.url }}" alt="Featured Image" class="w-full h-auto">
+            <div class="overlay"></div>
+            <div class="header-overlay">
+                <h1 class="title">{{page_data.title}}</h1>
+            </div>
+        </div>
+        <div class="container">
+            <div class="bg-gray-50 flex justify-center">
+                <div class="container mx-auto bg-white p-5">
+                    {{ page_data.content|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% include 'footer.html' %}
+{% endblock main_content %}

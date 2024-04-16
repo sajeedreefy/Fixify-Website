@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block style %}
+<style>
+    /* Additional custom styles can be added here */
+</style>
+{% endblock %}
+
+{% block main_content %}
+<div class="w-full">
+    <!-- Blog Post -->
+    <section class="px-4 py-8 mx-auto lg:py-10 lg:px-6">
+        <div class="max-w-screen-xl mx-auto space-y-8 lg:space-y-6 mt-10">
+            <!-- Hero Image -->
+            <!-- <img class="w-full object-cover h-64 md:h-48 lg:h-64" src="{{ post.featured_image.url }}" alt="Blog Hero Image"> -->
+            <div class="flex justify-center">
+                <img class="object-contain" src="{{ post.featured_image.url }}" alt="Blog Hero Image">
+            </div>
+            <!-- Content -->
+            <div class="p-10">
+                <!-- Title -->
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">{{ post.title }}</h2>
+                <!-- Meta Information -->
+                <div class="flex items-center text-sm text-gray-600 mb-4">
+                    <div class="">
+                        {% for category in post.categories.all %}
+                        <span class="bg-gray-200 rounded-full py-1 px-3 text-sm text-gray-700 mr-2">{{ category.name }}</span>
+                        {% endfor %}
+                    </div>
+                    <span>&nbsp;</span>
+                    <span><i class="far fa-clock"></i>&nbsp;{{ post.create_time }}</span>
+                </div>
+                <!-- Post Content -->
+                <p class="text-gray-700">
+                    {{ post.content | safe }}
+                </p>
+            </div>
+        </div>
+    </section>
+</div>
+{% include 'footer.html' %}
+{% endblock %}

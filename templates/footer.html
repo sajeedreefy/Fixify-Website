@@ -1,0 +1,96 @@
+
+
+{% load static %}
+<footer class="bg-black">
+    <div class="max-w-screen-xl p-4 py-6 mx-auto lg:py-16 md:p-8 lg:p-10">
+        <div class="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-4 flex flex-wrap">
+            <div>
+                <a href="/" class="flex items-center mb-5 text-2xl font-semibold text-gray-900">
+                    <img src="{{preference.logo.url}}" class="h-6 mr-3 sm:h-9" alt="Technician Logo" />
+                </a>
+                <ul class="text-gray-500">
+                    <li class="mb-4 flex">
+                        <div>
+                            <i class="fa-solid fa-location-dot mr-2"></i>
+                        </div>
+                        <div>
+                            <p>{{preference.address}}</p>
+                        </div>
+
+                    </li>
+                    <li class="mb-4 flex">
+                        <div>
+                            <i class="fa-solid fa-phone mr-2"></i>
+                        </div>
+                        <div>
+                            {{preference.phone|safe}}
+                        </div>
+                    </li>
+                    <li class="mb-4 flex">
+                        <div>
+                            <i class="fa-solid fa-envelope mr-2"></i>
+                        </div>
+                        <div>
+                            {{preference.email}}
+                        </div>
+                    </li>
+                </ul>
+
+            </div>
+            {% if footer_items %}
+                {% for item in footer_items|slice:":2" %}
+                    <div>
+                        <h3 class="mb-6 text-sm font-semibold text-white uppercase">{{ item.title }}</h3>
+                        <ul class="text-gray-500">
+                            {% if item.children.all %}
+                                {% for child in item.children.all|slice:":5" %}
+                                    <li class="mb-4">
+                                        <a href="{{ child.link }}" class="hover:underline">{{ child.title }}</a>
+                                    </li>
+                                {% endfor %}
+
+                            {% endif %}
+                        </ul>
+                    </div>
+                {% endfor %}
+
+            {% endif %}
+
+            <div>
+                <h3 class="mb-6 text-sm font-semibold text-white uppercase ">Follow Us</h3>
+                <ul class="mt-5 flex flex-col justify-between">
+                    <li class="mb-4">
+                        <a href="{{preference.facebook_url}}" class="text-gray-500 hover:text-gray-900 ">
+                            <i class="fa-brands fa-facebook mr-2"></i> Facebook
+                        </a>
+                    </li>
+                    <li class="mb-4">
+                        <a href="{{preference.linkedin_url}}" class="text-gray-500 hover:text-gray-900 ">
+                            <i class="fa-brands fa-linkedin mr-2"></i> Linkedin
+                        </a>
+                    </li>
+                    <li class="mb-4">
+                        <a href="{{preference.whatsapp}}" class="text-gray-500 hover:text-gray-900 ">
+                            <i class="fa-brands fa-solid fa-whatsapp mr-2"></i> Whatsapp
+
+                        </a>
+                    </li>
+                    <li class="mb-4">
+                        <a href="{{preference.instagram_url}}" class="text-gray-500 hover:text-gray-900 ">
+                            <i class="fa-brands fa-instagram mr-2"></i> Instagram
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <hr class="my-6 border-gray-200 sm:mx-auto  lg:my-8">
+        <div class="text-center">
+
+            <span class="block text-sm text-center text-gray-500 "> All Rights Reserved © 2024 Technician™
+                 <br>Developed by <a href="https://glascutr.com" target="_blank"
+                    class="text-purple-600 hover:underline">Glascutr Limited</a>
+            </span>
+
+        </div>
+    </div>
+</footer>
